@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>Valentine's surprise · mobile first</title>
+  <!-- Bootstrap 5 (lightweight) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
+      background: #0d0217; /* deep dark base */
+      color: #ffe4f0;
+      overflow-x: hidden;
+      position: relative;
+    }
+    /* dark pinkish gradient overlay for sections */
+    .section {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem 1.5rem;
+      text-align: center;
+      background: radial-gradient(circle at 10% 20%, #2a0e2a, #0a010f 90%);
+      border-bottom: 1px solid #ff3b6f20;
+      position: relative;
+      scroll-snap-align: start;
+    }
+    /* soft pink glow for cards / buttons */
+    .heart-btn, .btn-valentine, .gift-btn {
+      background: #ff1a4c;
+      border: none;
+      color: white;
+      font-weight: 600;
+      border-radius: 60px;
+      padding: 1rem 2.2rem;
+      font-size: 1.5rem;
+      box-shadow: 0 0 20px #ff3b6f, 0 0 40px #ff1493a0;
+      transition: transform 0.2s ease, box-shadow 0.3s;
+      backdrop-filter: blur(4px);
+    }
+    .heart-btn:hover, .btn-valentine:hover, .gift-btn:hover {
+      transform: scale(1.03);
+      box-shadow: 0 0 30px #ff69b4, 0 0 50px #ff1493;
+    }
+    .big-heart {
+      font-size: 7rem;
+      filter: drop-shadow(0 0 20px #ff3b6f);
+      animation: float 3s infinite;
+      cursor: pointer;
+      color: #ff3366;
+    }
+    @keyframes float {
+      0% { transform: scale(1) translateY(0); }
+      50% { transform: scale(1.05) translateY(-10px); text-shadow: 0 0 25px red; }
+      100% { transform: scale(1) translateY(0); }
+    }
+    .beat {
+      animation: beat 0.4s ease;
+    }
+    @keyframes beat {
+      0% { transform: scale(1); }
+      40% { transform: scale(1.4); }
+      70% { transform: scale(0.95); }
+      100% { transform: scale(1); }
+    }
+    h1, h2 {
+      font-weight: 500;
+      text-shadow: 0 0 12px #ff99cc;
+    }
+    .cursor-heart {
+      pointer-events: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 24px;
+      height: 24px;
+      color: #ff80b0;
+      filter: drop-shadow(0 0 6px #ff3366);
+      font-size: 1.8rem;
+      z-index: 9999;
+      opacity: 0.8;
+      transition: opacity 0.5s;
+    }
+    /* floating hearts background (footer effect) */
+    .floating-hearts-bg {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .heart-float {
+      position: absolute;
+      bottom: -20px;
+      color: #ff99cc;
+      font-size: 1.3rem;
+      opacity: 0.5;
+      animation: floatUp 8s linear infinite;
+    }
+    @keyframes floatUp {
+      0% { transform: translateY(0) rotate(0deg); opacity: 0.3; }
+      100% { transform: translateY(-120vh) rotate(20deg); opacity: 0; }
+    }
+    /* no button runaway container */
+    .runaway-container {
+      position: relative;
+      width: 100%;
+      height: 100px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 20px 0;
+    }
+    #noBtn {
+      position: absolute;
+      transition: left 0.2s ease, top 0.2s ease;
+      background: #444;
+      color: white;
+      border: none;
+      padding: 0.8rem 2rem;
+      border-radius: 40px;
+      font-weight: 600;
+      box-shadow: 0 4px 10px #00000060;
+      cursor: default;
+      z-index: 20;
+    }
+    #yesBtn {
+      background: #ff1a4c;
+      border: none;
+      padding: 0.8rem 2.5rem;
+      font-size: 1.5rem;
+      border-radius: 50px;
+      box-shadow: 0 0 20px #ff69b4;
+      font-weight: 600;
+      margin-right: 10px;
+      z-index: 15;
+    }
+    /* carousel romantic */
+    .carousel-item {
+      background: #1e1025;
+      border-radius: 40px;
+      padding: 2rem 1rem;
+      color: #ffc0e0;
+      box-shadow: 0 10px 25px #ff336640;
+    }
+    .carousel-item i {
+      font-size: 4rem;
+      color: #ff80b5;
+    }
+    .carousel-control-next, .carousel-control-prev {
+      filter: invert(1);
+    }
+    /* typing message */
+    #typingMessage {
+      font-size: 1.5rem;
+      min-height: 150px;
+      background: #2f1a33b0;
+      backdrop-filter: blur(6px);
+      border-radius: 50px;
+      padding: 2rem;
+      border: 1px solid #ff99cc;
+      color: #ffe2f0;
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+      box-shadow: 0 0 30px #ff149360;
+    }
+    .modal-content {
+      background: #1c0a1a;
+      color: #ffd9f0;
+      border: 2px solid #ff3377;
+      border-radius: 40px;
+    }
+    .modal-header {
+      border: none;
+    }
+    .btn-close {
+      background-color: #ffb0d0;
+    }
+    /* footer */
+    .romantic-footer {
+      background: #0b000f;
+      color: #ffbcd6;
+      padding: 2rem 1rem;
+      font-size: 1.4rem;
+      border-top: 2px solid #ff3f6f;
+      width: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+    /* scroll snap optional, smooth */
+    html {
+      scroll-behavior: smooth;
+    }
+    .section {
+      scroll-snap-align: start;
+    }
+    /* hide cursor trail on mobile for performance */
+    @media (max-width: 768px) {
+      .cursor-heart {
+        display: none;
+      }
+    }
+    /* message & gift */
+    .gift-icon {
+      font-size: 4rem;
+      color: #ff80b0;
+    }
+  </style>
+</head>
+<body>
+
+<!-- 🖱️ heart trail container (desktop) -->
+<div id="heartTrailContainer" style="position: fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:9999;"></div>
+
+<!-- landing section (1) -->
+<section class="section" id="landing">
+  <div class="floating-hearts-bg" id="floatHeartsBg"></div>
+  <div style="position: relative; z-index: 5;">
+    <i class="fas fa-heart big-heart" id="tapHeart"></i>
+    <h2 class="mt-4" style="font-weight: 300; letter-spacing: 2px;">💖 Tap the Heart 💖</h2>
+    <p style="color: #ff99bb;"><small>soft music will play ...</small></p>
+  </div>
+</section>
+
+<!-- question section (2) -->
+<section class="section" id="questionSection" style="display: flex;">
+  <div style="max-width: 600px;">
+    <h2 class="mb-5" style="font-size: 2.5rem;">Will you be my Valentine? 🥺❤️</h2>
+    <div class="d-flex flex-wrap justify-content-center align-items-center gap-4">
+      <button class="btn-valentine" id="yesBtn">💘 Yes</button>
+      <div class="runaway-container" style="width: 140px; height: 80px;">
+        <button id="noBtn">😅 No</button>
+      </div>
+    </div>
+    <p class="mt-5 text-white-50"><i>the "No" button runs 😂</i></p>
+  </div>
+</section>
+
+<!-- surprise / yes section (3) -->
+<section class="section" id="surpriseSection" style="display: flex;">
+  <div>
+    <i class="fas fa-heart" style="font-size: 5rem; color: #ff3377;"></i>
+    <h2 class="display-6" id="surpriseMessage">Yay! You just made my day ❤️</h2>
+    <div id="confettiZone" style="font-size: 3rem; margin: 1rem 0;">✨🎉❤️</div>
+    <button class="btn btn-outline-light rounded-pill mt-4" onclick="scrollToMemories()">Next → memories</button>
+  </div>
+</section>
+
+<!-- memory slider (4) bootstrap carousel -->
+<section class="section" id="memoriesSection">
+  <h2 class="mb-4">our little gallery 💞</h2>
+  <div id="loveCarousel" class="carousel slide" data-bs-ride="carousel" style="max-width: 500px; width: 100%;">
+    <div class="carousel-inner rounded-5">
+      <div class="carousel-item active">
+        <i class="fas fa-comment-dots"></i>
+        <h4 class="mt-3">Our first chat 💬</h4>
+        <p>"you had me at hello"</p>
+      </div>
+      <div class="carousel-item">
+        <i class="fas fa-smile-beam"></i>
+        <h4 class="mt-3">That smile 😍</h4>
+        <p>still makes me melt</p>
+      </div>
+      <div class="carousel-item">
+        <i class="fas fa-infinity"></i>
+        <h4 class="mt-3">Forever vibes 💞</h4>
+        <p>hand in hand</p>
+      </div>
+      <div class="carousel-item">
+        <i class="fas fa-camera-retro"></i>
+        <h4 class="mt-3">sunset memories</h4>
+        <p>you + me = ♾️</p>
+      </div>
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#loveCarousel" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon"></span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#loveCarousel" data-bs-slide="next">
+      <span class="carousel-control-next-icon"></span>
+    </button>
+  </div>
+</section>
+
+<!-- personalized message section (5) typing animation -->
+<section class="section" id="messageSection">
+  <h2 class="mb-3">a note for you ✍️</h2>
+  <div id="typingMessage"></div>
+</section>
+
+<!-- mini gift button (6) -->
+<section class="section" id="giftSection">
+  <button class="gift-btn" data-bs-toggle="modal" data-bs-target="#giftModal">
+    🎁 Open Your Gift
+  </button>
+</section>
+
+<!-- romantic footer (7) with floating hearts -->
+<footer class="romantic-footer text-center">
+  <p>Made with ❤️ only for you</p>
+  <div class="floating-hearts-bg" id="footerHearts"></div>
+</footer>
+
+<!-- Bootstrap modal for gift -->
+<div class="modal fade" id="giftModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header border-0 justify-content-end">
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body text-center pb-5">
+        <i class="fas fa-gift gift-icon"></i>
+        <i class="fas fa-rose ms-2" style="font-size:3rem; color:#ff80b5;"></i>
+        <h3 class="mt-4">🌹 This heart is yours forever 💖</h3>
+        <p class="text-secondary-emphasis">(teddy bear inside ⸜(｡˃ ᵕ ˂ )⸝♡</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- hidden audio (autoplay blocked, will play after first tap) -->
+<audio id="romanticAudio" loop preload="auto">
+  <source src="https://www.fesliyanstudios.com/musicfiles/2019-05-29_-_Love_Story_-_www.fesliyanstudios.com/15_05_2019_Heart_Beat_Love.mp3" type="audio/mpeg">
+  <!-- fallback short melody (public) -->
+  Your browser doesn't support audio.
+</audio>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  (function() {
+    // --- elements ---
+    const tapHeart = document.getElementById('tapHeart');
+    const audio = document.getElementById('romanticAudio');
+    const landing = document.getElementById('landing');
+    const questionSec = document.getElementById('questionSection');
+    const surpriseSec = document.getElementById('surpriseSection');
+    const yesBtn = document.getElementById('yesBtn');
+    const noBtn = document.getElementById('noBtn');
+    const typingDiv = document.getElementById('typingMessage');
+    const surpriseMsg = document.getElementById('surpriseMessage');
+    const confettiZone = document.getElementById('confettiZone');
+
+    // --- state ---
+    let musicStarted = false;
+    let typingDone = false;
+
+    // 1️⃣ heart tap: beat + music + scroll to question
+    tapHeart.addEventListener('click', function(e) {
+      e.stopPropagation();
+      // beat animation
+      tapHeart.classList.add('beat');
+      setTimeout(() => tapHeart.classList.remove('beat'), 500);
+
+      // music start (if not already)
+      if (!musicStarted) {
+        audio.play().catch(e => console.log('autoplay blocked, but user tap works', e));
+        musicStarted = true;
+      }
+
+      // smooth scroll to question section
+      questionSec.scrollIntoView({ behavior: 'smooth' });
+    });
+
+    // 2️⃣ runaway no button logic
+    const container = document.querySelector('.runaway-container');
+    function moveNoBtn() {
+      if (!noBtn || !container) return;
+      const containerRect = container.getBoundingClientRect();
+      const btnRect = noBtn.getBoundingClientRect();
+      const maxX = containerRect.width - btnRect.width - 10;
+      const maxY = containerRect.height - btnRect.height - 10;
+      if (maxX < 5 || maxY < 5) return;
+      const newX = Math.max(2, Math.min(maxX, Math.random() * maxX));
+      const newY = Math.max(2, Math.min(maxY, Math.random() * maxY));
+      noBtn.style.left = newX + 'px';
+      noBtn.style.top = newY + 'px';
+    }
+
+    // hover on any parent? we move on hover anywhere near
+    if (noBtn) {
+      noBtn.addEventListener('mouseenter', moveNoBtn);
+      noBtn.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        moveNoBtn();
+      }, { passive: false });
+      // also move on any attempt to click
+      noBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        moveNoBtn();
+      });
+    }
+
+    // 3️⃣ Yes click -> confetti, vibration, scroll, surprise section
+    yesBtn.addEventListener('click', function() {
+      // vibration if supported
+      if (window.navigator && window.navigator.vibrate) {
+        window.navigator.vibrate(200); // short romantic buzz
+      }
+
+      // confetti / hearts rain (visual)
+      if (confettiZone) {
+        confettiZone.innerHTML = '💖💗💓💞💕❤️‍🔥';
+        for (let i=0; i<12; i++) {
+          setTimeout(() => {
+            confettiZone.innerHTML += ' 🎊';
+          }, i*80);
+        }
+      }
+
+      // music (if not started)
+      if (!musicStarted) {
+        audio.play().catch(e=>{});
+        musicStarted = true;
+      }
+
+      // smooth scroll to surprise section
+      surpriseSec.scrollIntoView({ behavior: 'smooth' });
+
+      // set message
+      if (surpriseMsg) {
+        surpriseMsg.innerText = 'Yay! You just made my day ❤️';
+      }
+
+      // extra: small animation in surprise section
+    });
+
+    // 4️⃣ typing animation on message section (once it appears)
+    const messageSection = document.getElementById('messageSection');
+    const messageText = "I may not be perfect,\nbut my love for you is real ❤️\nHappy Valentine’s Day!";
+
+    function startTyping() {
+      if (typingDone || !typingDiv) return;
+      typingDiv.innerHTML = '';
+      let i = 0;
+      typingDone = true;
+      function type() {
+        if (i < messageText.length) {
+          typingDiv.innerHTML += messageText[i] === '\n' ? '<br>' : messageText[i];
+          i++;
+          setTimeout(type, 70);
+        }
+      }
+      type();
+    }
+
+    // intersection observer for typing
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting && entry.target.id === 'messageSection') {
+          startTyping();
+        }
+      });
+    }, { threshold: 0.3 });
+    observer.observe(messageSection);
+
+    // 5️⃣ heart trail effect (desktop)
+    const trailContainer = document.getElementById('heartTrailContainer');
+    document.addEventListener('mousemove', function(e) {
+      if (window.innerWidth <= 768) return; // mobile skip
+      const heart = document.createElement('i');
+      heart.className = 'fas fa-heart cursor-heart';
+      heart.style.left = (e.clientX - 10) + 'px';
+      heart.style.top = (e.clientY - 10) + 'px';
+      heart.style.position = 'fixed';
+      heart.style.fontSize = '1.5rem';
+      heart.style.color = '#ff80bf';
+      heart.style.opacity = '0.9';
+      heart.style.pointerEvents = 'none';
+      heart.style.zIndex = '99999';
+      heart.style.transition = 'opacity 0.8s, transform 0.8s';
+      document.body.appendChild(heart);
+      setTimeout(() => {
+        heart.style.opacity = '0';
+        heart.style.transform = 'translateY(-20px)';
+      }, 30);
+      setTimeout(() => {
+        if (heart.parentNode) heart.remove();
+      }, 700);
+    });
+
+    // 6️⃣ floating hearts background (footer + extra)
+    function createFloatingHearts(containerId, count = 10) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      for (let i=0; i<count; i++) {
+        const heart = document.createElement('i');
+        heart.className = 'fas fa-heart heart-float';
+        heart.style.left = Math.random() * 100 + '%';
+        heart.style.animationDuration = (6 + Math.random() * 8) + 's';
+        heart.style.fontSize = (0.7 + Math.random() * 1.5) + 'rem';
+        heart.style.opacity = 0.1 + Math.random() * 0.3;
+        heart.style.animationDelay = (Math.random() * 5) + 's';
+        container.appendChild(heart);
+      }
+    }
+    createFloatingHearts('floatHeartsBg', 15);   // landing
+    createFloatingHearts('footerHearts', 12);    // footer
+
+    // 7️⃣ scroll helper
+    window.scrollToMemories = function() {
+      document.getElementById('memoriesSection').scrollIntoView({ behavior: 'smooth' });
+    };
+
+    // extra: if no button still wants to be clicked, keep moving
+    setInterval(() => {
+      // occasionally move no button if it's visible (optional)
+      if (noBtn && noBtn.offsetParent) {
+        // but only if mouse near? keep it safe, move sometimes for fun
+        if (Math.random() < 0.1) moveNoBtn();
+      }
+    }, 1000);
+
+    // for "open your gift" - modal already hooked
+  })();
+</script>
+
+<!-- optional inline style for carousel text -->
+<style>
+  .carousel-item { min-height: 280px; display: flex; flex-direction: column; justify-content: center; }
+  #noBtn { left: 10px; top: 10px; }
+  .runaway-container { position: relative; }
+  .btn-valentine { background: #ff1a75; border: 2px solid #ffb0d0; }
+  .romantic-footer p { margin: 0; position: relative; z-index: 10; }
+  /* smooth spacing */
+</style>
+</body>
+</html>
